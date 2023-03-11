@@ -4,6 +4,7 @@ use std::{
     thread::sleep,
     time::Duration,
 };
+
 mod jay_patel;
 
 fn main() {

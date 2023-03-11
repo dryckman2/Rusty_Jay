@@ -1,6 +1,6 @@
 use ansi_term::Colour::Fixed;
 use ansi_term::Style;
-use std::fmt::{ Display};
+use std::fmt::Display;
 
 #[derive(Default)]
 pub struct RandomJayPatel {
@@ -16,20 +16,29 @@ pub struct RandomJayPatel {
     colored: bool,
     color: u8,
 }
-pub fn randomize_jay(mut rng: u64) -> RandomJayPatel {
+
+pub fn randomize_jay(mut seed: u64) -> RandomJayPatel {
     let mut making = RandomJayPatel::default();
 
-    making.ending = (if read_bit(&mut rng, 1) { "\n" } else { " " }).to_string();
-    making.middle = (if read_bit(&mut rng, 1) { "Sanjay " } else { "" }).to_string();
-    making.bold = read_bit(&mut rng, 2);
-    making.dimmed = read_bit(&mut rng, 1);
-    making.italic = read_bit(&mut rng, 1);
-    making.underline = read_bit(&mut rng, 1);
-    making.blink = read_bit(&mut rng, 2);
-    making.reverse = read_bit(&mut rng, 2);
-    making.strikethrough = read_bit(&mut rng, 3);
-    making.colored = read_bit(&mut rng, 0);
-    making.color = (rng & 0b11111111) as u8;
+    making.ending = (if read_bit(&mut seed, 1) { "\n" } else { " " }).to_string();
+    making.middle = (if read_bit(&mut seed, 1) {
+        "Sanjay "
+    } else {
+        ""
+    })
+    .to_string();
+    making.bold = read_bit(&mut seed, 2);
+    making.dimmed = read_bit(&mut seed, 1);
+    making.italic = read_bit(&mut seed, 1);
+    making.underline = read_bit(&mut seed, 1);
+    making.blink = read_bit(&mut seed, 3);
+    making.reverse = read_bit(&mut seed, 2);
+    making.strikethrough = read_bit(&mut seed, 3);
+    //making.colored = read_bit(&mut seed, 0);
+    making.colored = true;
+    //Limits Colors to non white or black from the Fixed Library
+    making.color = (((seed & 0b11111111) % 215) + 16) as u8;
+
     making
 }
 
