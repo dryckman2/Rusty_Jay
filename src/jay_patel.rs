@@ -4,8 +4,8 @@ use std::fmt::Display;
 
 #[derive(Default)]
 pub struct RandomJayPatel {
-    ending: String,
-    middle: String,
+    ending: bool,
+    middle: bool,
     bold: bool,
     dimmed: bool,
     italic: bool,
@@ -18,28 +18,33 @@ pub struct RandomJayPatel {
 }
 
 pub fn randomize_jay(mut seed: u64) -> RandomJayPatel {
-    let mut making = RandomJayPatel::default();
-
-    making.ending = (if read_bit(&mut seed, 1) { "\n" } else { " " }).to_string();
-    making.middle = (if read_bit(&mut seed, 1) {
-        "Sanjay "
-    } else {
-        ""
-    })
-    .to_string();
-    making.bold = read_bit(&mut seed, 2);
-    making.dimmed = read_bit(&mut seed, 1);
-    making.italic = read_bit(&mut seed, 1);
-    making.underline = read_bit(&mut seed, 1);
-    making.blink = read_bit(&mut seed, 3);
-    making.reverse = read_bit(&mut seed, 2);
-    making.strikethrough = read_bit(&mut seed, 3);
-    //making.colored = read_bit(&mut seed, 0);
-    making.colored = true;
+    let ending = read_bit(&mut seed, 1);
+    let middle = read_bit(&mut seed, 1);
+    let bold = read_bit(&mut seed, 2);
+    let dimmed = read_bit(&mut seed, 1);
+    let italic = read_bit(&mut seed, 1);
+    let underline = read_bit(&mut seed, 1);
+    let blink = read_bit(&mut seed, 3);
+    let reverse = read_bit(&mut seed, 2);
+    let strikethrough = read_bit(&mut seed, 3);
+    //let colored = read_bit(&mut seed, 0);
+    let colored = true;
     //Limits Colors to non white or black from the Fixed Library
-    making.color = (((seed & 0b11111111) % 215) + 16) as u8;
+    let color = (((seed & 0b11111111) % 215) + 16) as u8;
 
-    making
+    RandomJayPatel {
+        ending,
+        middle,
+        bold,
+        dimmed,
+        italic,
+        underline,
+        blink,
+        reverse,
+        strikethrough,
+        colored,
+        color,
+    }
 }
 
 impl Display for RandomJayPatel {
@@ -49,7 +54,13 @@ impl Display for RandomJayPatel {
 }
 
 fn apply_filters(jay: &RandomJayPatel) -> String {
-    let mut s = format!("Jay {}Patel", jay.middle);
+    let mut s: String = (if jay.middle {
+        "Jay Sanjay Patel"
+    } else {
+        "Jay Patel"
+    })
+    .to_string();
+
     if jay.reverse {
         s = Style::new().reverse().paint(s).to_string();
     }
@@ -72,11 +83,14 @@ fn apply_filters(jay: &RandomJayPatel) -> String {
         s = Style::new().strikethrough().paint(s).to_string();
     }
 
+    //Color
     if jay.colored {
         s = Fixed(jay.color).paint(s).to_string();
     }
+    if jay.ending {
+        s += "\n";
+    }
 
-    s = format!("{}{}", jay.ending, s);
     s
 }
 
